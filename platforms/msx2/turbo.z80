@@ -1,0 +1,9 @@
+.globl _enable_turbo
+
+CHGCPU = 0x0180
+ 
+_enable_turbo::
+	ld a, #CHGCPU
+	cp #0x0c3
+	ld a, #0x82             ; can be ld a,81h for R800 ROM if you wish
+	jp z, CHGCPU

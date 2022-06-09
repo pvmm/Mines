@@ -231,6 +231,7 @@ void draw_minefield(minefield* mf)
 
 void platform_init()
 {
+    //enable_turbo();
     set_random_seed(read_clock());
     video_init();
     draw_scenario();

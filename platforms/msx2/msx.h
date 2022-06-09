@@ -56,4 +56,6 @@ uint16_t xorshift();
 
 uint32_t read_clock() SDCCCALL0;
 
+void enable_turbo();
+
 #endif /* MSX_H */
