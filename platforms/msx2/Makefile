@@ -45,6 +45,9 @@ openmsx: run
 run: $(TARGET).rom
 	openmsx -carta $(TARGET).rom -machine C-BIOS_MSX2 -script debugdevice.tcl
 
+mouse: $(TARGET).rom
+	openmsx -carta $(TARGET).rom -machine C-BIOS_MSX2 -script mouse.tcl
+
 $(BUILDDIR)/%.rel: ../../common/%.c $(BUILDDIR) ../../common/common.h
 	$(Z80_CC) $(Z80_CFLAGS) $(SCREEN_RESOLUTION) -c $< -o $@
 

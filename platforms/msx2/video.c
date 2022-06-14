@@ -81,6 +81,12 @@ void highlight_cell(int x, int y)
 
 void platform_init()
 {
+    mouse_x_offset = 0; mouse_y_offset = 0;
+
+    /* check mouse for one second */
+    uint8_t mouse = search_mouse();
+    debug("mouse? ", mouse);
+
     set_random_seed(read_clock());
     video_init();
     draw_scenario();
