@@ -9,6 +9,8 @@ proc pause_on {} {
     debug set_watchpoint write_io {0x2e} {} {pause $::wp_last_value}
 }
 
+plug joyporta mouse
+
 if { [info exists ::env(DEBUG)] } {
     set use_pause $::env(DEBUG)
     ext debugdevice

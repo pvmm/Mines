@@ -90,6 +90,7 @@ void platform_init()
 void idle_loop(minefield* mf)
 {
     mf;
+    input_mouse();
 }
 
 

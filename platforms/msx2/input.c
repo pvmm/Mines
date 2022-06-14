@@ -60,6 +60,17 @@ uint8_t input_read(uint8_t source)
 }
 
 
+uint16_t input_mouse()
+{
+    debug_break();
+    uint16_t coords = read_any_mouse();
+    debug("x = ", coords >> 8);
+    debug("y = ", coords & 0xff);
+
+    return coords;
+}
+
+
 static const uint8_t MATRIX_KEY_2_COLUMN[8][12] = {
 	"08'CKS\000\000 \0005",
 	"19`DLT\000\000\000\0006",

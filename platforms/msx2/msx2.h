@@ -75,4 +75,8 @@ struct sprite_attr {
 /* low level sprite placement function */
 void put_sprite_attr(struct sprite_attr *src, uint8_t index) SDCCCALL0;
 
+uint16_t input_mouse();
+
+uint16_t read_any_mouse() SDCCCALL0;
+
 #endif /* MSX2_H */
