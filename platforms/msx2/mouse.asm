@@ -15,7 +15,7 @@ _search_mouse::
 	ld b, #60
 
 search_mouse_loop:
-	ei
+	;ei
 	halt
 	push bc
 	call check_mouse
@@ -61,12 +61,18 @@ check_mouse:
 
 	ret
 
+_center_mouse::
+	ld hl, #_mouse_x_offset
+	ld (hl), #128
+	inc hl
+	inc hl
+	ld (hl), #106
+	ret
+
 _read_mouse::
 	xor a
-	ld (_mouse_x_offset), a
-	ld (_mouse_y_offset), a
 	ld (_mouse_button1), a
-	ld (_mouse_button2), a  ; clean position variables
+	ld (_mouse_button2), a  ; clear memory variables
 
 	ld a, (_has_mouse)
 	or a
@@ -93,7 +99,19 @@ read_mouse_dir:
 	ld a, b
 	push bc
 	call GTPAD              ; get x offset
-	ld (_mouse_x_offset), a ; save value
+	ld h, #0
+	ld l, a
+	bit #7, a
+	jr z, non_negative_x_offset
+	ld d, #1
+	ld e, #0
+	sbc hl, de
+non_negative_x_offset:
+	ld hl, #_mouse_x_offset
+	ld (hl), a ; save value
+	inc hl
+	xor a
+	ld (hl), a
 
 	pop bc
 	inc b                   ; y offset parameter

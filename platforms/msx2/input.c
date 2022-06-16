@@ -3,6 +3,8 @@
 #include "ports.h"
 #include "common.h"
 
+#pragma disable_warning 110
+
 
 static uint8_t keyboard_read_row(uint8_t row) __z88dk_fastcall __naked
 {
@@ -53,12 +55,11 @@ static uint8_t keyboard_read()
 uint8_t input_read(uint8_t source)
 {
 	if (has_mouse > 0) {
-		//if (mouse_x_offset > 0 || mouse_y_offset > 0) {
-		//if (mouse_x_offset > 0 || mouse_y_offset > 0) {
-			debug_break();
+		if (mouse_x_offset > 0 || mouse_y_offset > 0) {
+			//debug_break();
 			debug("x = ", mouse_x_offset);
 			debug("y = ", mouse_y_offset);
-		//}
+		}
 		read_mouse();
 	}
 

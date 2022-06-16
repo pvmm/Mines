@@ -12,6 +12,7 @@ proc pause_on {} {
 if { [info exists ::env(DEBUG)] } {
     set use_pause $::env(DEBUG)
     ext debugdevice
-    set grabinput on ; # capture all input from mouse
+    plug joyporta mouse
+    set grabinput on    ; # capture ALL input from mouse (to disable it press F10 in openMSX and type "set grabinput off")
     debug set_watchpoint write_io {0x2e} {} {pause $::wp_last_value}
 }
