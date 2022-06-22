@@ -13,13 +13,16 @@
  */
 void set_tile(uint8_t x, uint8_t y, uint8_t tile);
 
-#ifdef _16x16_TILES
+#ifdef _16x16_METATILES
 /**
- * Set the tile appearance of the group (`x` .. `x + 1`, `y` .. `y + 1`) on
- * the board according to `tile` index.
+ * Set the tile appearance of a group of tiles (`x` .. `x + 1`, `y` .. `y + 1`)
+ * or metatiles on the board according to `tile` index that represents the first
+ * position at (`x`, `y`).
  *
  * See [tile_index](#tile_index) for tile index values.
  */
+#define TILE_W 2
+#define TILE_H 2
 void set_group(uint8_t x, uint8_t y, uint8_t tile);
 #endif /* _16X16_TILES */
 
