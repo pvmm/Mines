@@ -4,11 +4,43 @@
 #include <stdint.h>
 #include "minefield.h"
 
-void set_tile(uint8_t dst_x, uint8_t dst_y, uint8_t tile);
+
+/**
+ * Set the tile appearance at (`x`, `y`) board coordinates according to `tile`
+ * index.
+ *
+ * See [tile_index](#tile_index) for tile index values.
+ */
+void set_tile(uint8_t x, uint8_t y, uint8_t tile);
+
+#ifdef _16x16_TILES
+/**
+ * Set the tile appearance of the group (`x` .. `x + 1`, `y` .. `y + 1`) on
+ * the board according to `tile` index.
+ *
+ * See [tile_index](#tile_index) for tile index values.
+ */
+void set_group(uint8_t x, uint8_t y, uint8_t tile);
+#endif /* _16X16_TILES */
+
+/**
+ * Draw the background image that lays around the board.
+ *
+ * Note: some platforms use the `GROUND` tile to cover the whole background
+ * area.
+ *
+ * See [tile_index](#tile_index) for the index value of the `GROUND` tile.
+ */
 void draw_scenario();
+
+/**
+ * Draw a tile or sprite cursor on the specified board position defined by the
+ * (`x`, `y`) coordinates.
+ */
 void highlight_cell(minefield* mf, int x, int y);
 
-enum {
+
+enum tile_index {
 	/*	NOTE:
 		The tile codes for the number
 		of bombs *MUST* be sequential
