@@ -2,18 +2,54 @@
 #include "minefield.h"
 
 
-/* declare draw_single_cell according to tile size */
-#ifdef _16X16_METATILES
-#include "tiles/16x16.c"
-#else
-#include "tiles/8x8.c"
-#endif /* _16X16_TILES */
+#ifndef _2X2_CELLS
+#define set_cell set_tile
+#endif /* _2X2_CELLS */
+
+void draw_single_cell(minefield* mf, uint8_t x, uint8_t y)
+{
+	if (CELL(mf, x, y) & ISOPEN) {
+		if (CELL(mf, x, y) & HASBOMB) {
+			set_cell(MINEFIELD_X_OFFSET + x * 2 + 1,
+			         MINEFIELD_Y_OFFSET + y * 2 + 1,
+			         BOMB);
+		} else {
+			uint8_t tile_number = 0;
+			uint8_t count = CELL(mf, x, y) & 0x0F;
+
+			if (count > 0 && count < 9) {
+				tile_number = ONE_BOMB + count - 1;
+				set_cell(MINEFIELD_X_OFFSET + x * 2 + 1,
+				         MINEFIELD_Y_OFFSET + y * 2 + 1,
+				         tile_number);
+			} else {
+				set_cell(MINEFIELD_X_OFFSET + x * 2 + 1,
+				         MINEFIELD_Y_OFFSET + y * 2 + 1,
+				         BLANK);
+			}
+		}
+	} else {
+		if (CELL(mf, x, y) & HASFLAG) {
+			set_cell(MINEFIELD_X_OFFSET + x * 2 + 1,
+			         MINEFIELD_Y_OFFSET + y * 2 + 1,
+			         FLAG);
+		} else if (CELL(mf, x, y) & HASQUESTIONMARK) {
+			set_cell(MINEFIELD_X_OFFSET + x * 2 + 1,
+			         MINEFIELD_Y_OFFSET + y * 2 + 1,
+			         QUESTION_MARK);
+		} else {
+			set_cell(MINEFIELD_X_OFFSET + x * 2 + 1,
+			         MINEFIELD_Y_OFFSET + y * 2 + 1,
+			         CLOSED_CELL);
+		}
+	}
+}
 
 
 void draw_minefield_contents(minefield *mf)
 {
-	for (uint8_t x = 0; x < mf->width; x++) {
-		for (uint8_t y = 0; y < mf->height; y++) {
+	for (uint8_t x = 0; x < mf->width; x+= CELL_W) {
+		for (uint8_t y = 0; y < mf->height; y += CELL_H) {
 			draw_single_cell(mf, x, y);
 		}
 	}

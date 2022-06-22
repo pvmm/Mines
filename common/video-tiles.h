@@ -4,30 +4,56 @@
 #include <stdint.h>
 #include "minefield.h"
 
-
 /**
- * Set the tile appearance at (`x`, `y`) board coordinates according to `tile`
- * index.
+ * Required. Set the tile at (`x`, `y`) board coordinates to the tile defined
+ * by `tile` index.
+ *
+ * Implementation details
+ * ----------------------
  *
  * See [tile_index](#tile_index) for tile index values.
  */
 void set_tile(uint8_t x, uint8_t y, uint8_t tile);
 
-#ifdef _16x16_METATILES
+/* define cell size */
+#ifdef _2X2_CELLS
+#define CELL_W 2
+#define CELL_H 2
+#else
+#define CELL_W 1
+#define CELL_H 1
+#endif /* _2X2_CELLS */
+
 /**
- * Set the tile appearance of a group of tiles (`x` .. `x + 1`, `y` .. `y + 1`)
- * or metatiles on the board according to `tile` index that represents the first
- * position at (`x`, `y`).
+ * Optional. Set the metatile at (`x` .. `x + 1`, `y` .. `y + 1`) board
+ * coordinates starting with the `tile` index that represents the upper left
+ * tile if `_2x2_CELLS` is defined.
+ *
+ * Implementation details
+ * ----------------------
  *
  * See [tile_index](#tile_index) for tile index values.
  */
-#define TILE_W 2
-#define TILE_H 2
 void set_group(uint8_t x, uint8_t y, uint8_t tile);
-#endif /* _16X16_TILES */
 
 /**
- * Draw the background image that lays around the board.
+ * Draws a cell identified by `tile` index on the board.
+ *
+ * Implementation details
+ * ----------------------
+ *
+ * if `_2x2_CELLS` is defined `draw_single_cell()` draws a group of tiles or
+ * ("metatiles") on the board at position (`x` .. `x + 1`, `y` .. `y + 1`)
+ * starting with the `tile` index that represents the upper left tile.
+ *
+ * Otherwise, a cell has the same size of a single tile.
+ *
+ * See [tile_index](#tile_index) for tile index values.
+ */
+void draw_single_cell(minefield* mf, uint8_t x, uint8_t y);
+
+/**
+ * Provided. Draw the background image that lays around the board.
  *
  * Note: some platforms use the `GROUND` tile to cover the whole background
  * area.
@@ -37,8 +63,16 @@ void set_group(uint8_t x, uint8_t y, uint8_t tile);
 void draw_scenario();
 
 /**
- * Draw a tile or sprite cursor on the specified board position defined by the
- * (`x`, `y`) coordinates.
+ * Required. Draw a tile or sprite cursor on the specified board position
+ * defined by the (`x`, `y`) coordinates.
+ *
+ * Implementation details
+ * ----------------------
+ * 
+ * If game status is `GAME_OVER`, the current cursor should be replaced by
+ * (or drawn together with) an `EXPLOSION` tile.
+ *
+ * See [tile_index](#tile_index) for the index value of the `EXPLOSION` tile.
  */
 void highlight_cell(minefield* mf, int x, int y);
 
