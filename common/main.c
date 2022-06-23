@@ -39,11 +39,18 @@ void update_gameplay_input(minefield* mf, uint8_t input)
 
 		case MINE_INPUT_OPEN:
 			open_cell(mf, x, y);
+			if (mf->state == PLAYING_GAME) {
+				mf->state = check_endgame(mf);
+			}
 			break;
 
 		case MINE_INPUT_OPEN_BLOCK:
-			if (!has_bomb && (count_surrounding_flags(mf, x, y) == num_bombs_around))
+			if (!has_bomb && (count_surrounding_flags(mf, x, y) == num_bombs_around)) {
 				open_block(mf, x, y);
+				if (mf->state == PLAYING_GAME) {
+					mf->state = check_endgame(mf);
+				}
+			}
 			break;
 
 		case MINE_INPUT_FLAG:
@@ -55,6 +62,7 @@ void update_gameplay_input(minefield* mf, uint8_t input)
 					mf->cells[mf->current_cell] &= ~HASQUESTIONMARK;
 				} else {
 					mf->cells[mf->current_cell] |= HASFLAG;
+					mf->state = check_endgame(mf);
 				}
 			}
 			mf->changed = true;
@@ -174,6 +182,7 @@ int main() {
 			case PLAYING_GAME:
 				gameplay_update(mf);
 				break;
+			case GAME_WON:
 			case GAME_OVER:
 				game_over_update(mf);
 				break;
