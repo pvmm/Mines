@@ -162,7 +162,7 @@ void platform_init()
 
 void reset_timer()
 {
-    debug_msg("reset_timer() called\n");
+    /* debug_msg("reset_timer() called\n"); */
     ticks = 0;
     seconds = 0;
     minutes = 0;
@@ -217,12 +217,12 @@ void idle_update(minefield* mf)
     switch (++fifth) {
         case 3: {
             /* count how many times mouse is not found */
-            uint8_t tmp = search_mouse();
-            if (tmp == 0xff) {
+            int8_t mouse = search_mouse();
+            if (mouse == -1) {
                 no_mouse = (no_mouse | 0b1) + 2;
             } else {
                 /* found: reset counter */
-                source = tmp;
+                source = mouse;
                 no_mouse = 0;
             }
             break;
