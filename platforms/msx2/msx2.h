@@ -81,6 +81,8 @@ struct sprite_attr {
 /* low level sprite placement function */
 void put_sprite_attr(struct sprite_attr *src, uint8_t index) SDCCCALL0;
 
+#define IGNORE_MOUSE_THRESHOLD 10
+
 /* search for plugged mouse device */
 int8_t search_mouse();
 

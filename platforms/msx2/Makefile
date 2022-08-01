@@ -22,7 +22,7 @@ TARGET := $(BUILDDIR)/mines
 CODE := 0x4000
 DATA := 0xc000
 ROM_MAX := 0x8000
-Z80_CFLAGS := $(Z80_CFLAGS) -mz80 --Werror --fsigned-char --std-sdcc99 --opt-code-size  --fomit-frame-pointer $(EXTRA_Z80_CFLAGS) -I. -I../../common
+Z80_CFLAGS := $(Z80_CFLAGS) -mz80 --less-pedantic --Werror --fsigned-char --std-sdcc99 --opt-code-size  --fomit-frame-pointer $(EXTRA_Z80_CFLAGS) -I. -I../../common
 Z80_LDFLAGS := --no-std-crt0
 
 C_SOURCES := $(wildcard *.c)
