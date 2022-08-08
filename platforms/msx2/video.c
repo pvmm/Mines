@@ -6,6 +6,9 @@
 #include "minefield.h"
 #include "tiles.h"
 #include "timer.h"
+#include "input.h"
+#include "mouse.h"
+#include "video.h"
 
 //#define USE_DEBUG_MODE
 #include "debug.h"

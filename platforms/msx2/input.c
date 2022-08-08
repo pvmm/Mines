@@ -2,8 +2,10 @@
 #include "msx2.h"
 #include "ports.h"
 #include "common.h"
+#include "input.h"
 
 
+/* mouse port */
 uint8_t source_mouse = 0xff;
 
 
@@ -25,6 +27,7 @@ static uint8_t keyboard_read_row(uint8_t row) __z88dk_fastcall __naked
 static uint8_t keyboard_read()
 {
     uint8_t scan;
+
     /* previous row statuses */
     static uint8_t row4 = 0xff;
     static uint8_t row8 = 0xff;
@@ -53,32 +56,27 @@ static uint8_t keyboard_read()
 }
 
 
-static joydata joy;
-
-
 static uint8_t joystick_read(uint8_t source)
 {
     uint8_t input = read_raw_joyport(source);
 
-    if (!(input & (1 << 0))) {
-        return MINE_INPUT_UP;
-    }
-    if (!(input & (1 << 1))) {
-        return MINE_INPUT_DOWN;
-    }
-    if (!(input & (1 << 2))) {
-        return MINE_INPUT_LEFT;
-    }
-    if (!(input & (1 << 3))) {
-        return MINE_INPUT_RIGHT;
-    }
-    if (!(input & (1 << 4))) {
-        debug_msg("button1\n");
+    if (!(input & JOY_INPUT_BUTTON1)) {
         return MINE_INPUT_OPEN;
     }
-    if (!(input & (1 << 5))) {
-        debug_msg("button2\n");
+    if (!(input & JOY_INPUT_BUTTON2)) {
         return MINE_INPUT_FLAG;
+    }
+    if (!(input & JOY_INPUT_UP)) {
+        return MINE_INPUT_UP;
+    }
+    if (!(input & JOY_INPUT_DOWN)) {
+        return MINE_INPUT_DOWN;
+    }
+    if (!(input & JOY_INPUT_LEFT)) {
+        return MINE_INPUT_LEFT;
+    }
+    if (!(input & JOY_INPUT_RIGHT)) {
+        return MINE_INPUT_RIGHT;
     }
     return MINE_INPUT_IGNORED;
 }

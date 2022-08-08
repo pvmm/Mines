@@ -5,8 +5,10 @@
 #include "tiles.h"
 #include "game.h"
 #include "minefield.h"
+#include "video.h"
+#include "mouse.h"
 
-
+/* buttons and x/y offsets */
 joydata mouse;
 
 /* contextual mouse data */
