@@ -28,6 +28,7 @@ BINTOOL := ./tools/MSXbin
 
 BUILDDIR := build
 TARGET := $(BUILDDIR)/mines
+MPLAYER := $(BUILDDIR)/mplayer/mplayer.lib
 CODE := 0x4000
 DATA := 0xc000
 ROM_MAX := 0x8000
@@ -44,8 +45,8 @@ Z80_LIBS :=
 
 .PHONY: all clean tools openmsx run
 all: $(TARGET).rom
-$(TARGET).rom: $(OBJECTS) $(COMMON) $(BUILDDIR)/crt0.rel
-	$(Z80_CC) $(Z80_CFLAGS) $(Z80_LDFLAGS) $(Z80_LIBS) --code-loc $(CODE) --data-loc $(DATA) $(BUILDDIR)/crt0.rel $(OBJECTS) $(COMMON) -o $(TARGET).ihx
+$(TARGET).rom: $(OBJECTS) $(COMMON) $(MPLAYER) $(BUILDDIR)/crt0.rel
+	$(Z80_CC) $(Z80_CFLAGS) $(Z80_LDFLAGS) $(Z80_LIBS) --code-loc $(CODE) --data-loc $(DATA) $(BUILDDIR)/crt0.rel $(OBJECTS) $(COMMON) $(MPLAYER) -o $(TARGET).ihx
 	#$(HEXTOOL) $(TARGET).ihx -o $(TARGET).rom -e ROM -p 0xFF -s 0x4000 -l $(ROM_MAX)
 	$(HEXTOOL) -e bin -p FF -l $(ROM_MAX) $(TARGET).ihx
 	@cp $(TARGET).bin $(TARGET).rom
@@ -54,6 +55,9 @@ openmsx: run
 
 run: $(TARGET).rom
 	openmsx -carta $(TARGET).rom -machine C-BIOS_MSX2 -script debugdevice.tcl
+
+$(MPLAYER): mplayer/Makefile
+	make -C mplayer
 
 $(BUILDDIR)/16x16/%.rel: ../../common/16x16/%.c $(BUILDDIR) ../../common/common.h
 	$(Z80_CC) $(Z80_CFLAGS) $(SCREEN_LAYOUT) -c $< -o $@
@@ -85,4 +89,5 @@ $(SC5TOOL): tools/SCREEN5.c
 
 clean:
 	rm -rf $(OBJECTS) $(COMMON) build
+	make -C mplayer clean
 	make -C tools clean
