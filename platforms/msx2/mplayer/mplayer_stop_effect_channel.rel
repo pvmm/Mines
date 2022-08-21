@@ -1,0 +1,11 @@
+XL3
+H 1 areas 3 global symbols
+M mplayer
+S _PLY_AKM_STOPSOUNDEFFECTFROMCHANNEL Ref000000
+S .__.ABS. Def000000
+A _CODE size 4 flags 0 addr 0
+S _mplayer_stop_effect_channel Def000000
+T 00 00 00
+R 00 00 00 00
+T 00 00 00 7D C3 00 00
+R 00 00 00 00 02 05 00 00
