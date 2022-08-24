@@ -113,24 +113,36 @@ inline void title_screen_update(minefield* mf)
             mf->state = PLAYING_GAME;
             reset_minefield(mf);
             draw_minefield(mf);
+
 #ifdef ENABLE_TIMER
             reset_timer();
-#endif /* ENABLE_TIMER */
+#endif // ENABLE_TIMER
+
+#ifdef ENABLE_START_GAME_HOOK
+            start_game();
+#endif // ENABLE_START_GAME_HOOK
+
             break;
         case MINE_INPUT_QUIT:
             mf->state = QUIT;
             break;
         default:
-            /* Ignore cursor moves when game over */
+            // Ignore cursor moves when game over
             break;
     }
 #else
     mf->state = PLAYING_GAME;
     reset_minefield(mf);
     draw_minefield(mf);
+
 #ifdef ENABLE_TIMER
     reset_timer();
-#endif /* ENABLE_TIMER */
+#endif // ENABLE_TIMER
+
+#ifdef ENABLE_START_GAME_HOOK
+    start_game();
+#endif // ENABLE_START_GAME_HOOK
+
 #endif
 }
 
