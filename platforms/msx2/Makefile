@@ -1,5 +1,5 @@
 export PATH := $(PWD)/../../bin:$(PATH)
-Z80_CFLAGS := $(Z80_CFLAGS) -DUNUSED_MACRO -DMINEFIELD_ALLOCATION -DENABLE_PLATFORM_DRAW_HOOK
+Z80_CFLAGS := $(Z80_CFLAGS) -DUNUSED_MACRO -DMINEFIELD_ALLOCATION -DENABLE_PLATFORM_DRAW_HOOK -DENABLE_START_GAME_HOOK
 ifeq ($(DEBUG),1)
     Z80_CFLAGS := $(Z80_CFLAGS) -DUSE_DEBUG_MODE
 else
@@ -44,7 +44,7 @@ COMMON := $(patsubst ../../common/%.c,$(BUILDDIR)/%.rel,$(wildcard ../../common/
 Z80_LIBS :=
 
 .PHONY: all clean tools openmsx run
-all: $(TARGET).rom
+all: $(TARGET).rom Makefile
 $(TARGET).rom: $(OBJECTS) $(COMMON) $(MPLAYER) $(BUILDDIR)/crt0.rel
 	$(Z80_CC) $(Z80_CFLAGS) $(Z80_LDFLAGS) $(Z80_LIBS) --code-loc $(CODE) --data-loc $(DATA) $(BUILDDIR)/crt0.rel $(OBJECTS) $(COMMON) $(MPLAYER) -o $(TARGET).ihx
 	#$(HEXTOOL) $(TARGET).ihx -o $(TARGET).rom -e ROM -p 0xFF -s 0x4000 -l $(ROM_MAX)
