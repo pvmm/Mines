@@ -46,7 +46,24 @@ proc addr2string {addr} {
 proc printf__c {addr}     { puts -nonewline [format "%c"       [peek [peek16 $addr]]] }
 proc printf__s {num addr} { puts -nonewline [format "%${num}s" [addr2string [peek16 [peek16 $addr]]]] }
 proc printf__S {num addr} { puts -nonewline [format "%${num}s" [string toupper [addr2string [peek16 [peek16 $addr]]]]] }
-proc printf__i {addr}     { puts -nonewline [format "%i"       [peek16 [peek16 $addr]]] }
+proc printf__hhi {addr}   { puts -nonewline [format "%hi"      [peek8  [peek16 $addr]]] }
+proc printf__hi  {addr}   { puts -nonewline [format "%hi"      [peek16 [peek16 $addr]]] }
+proc printf__i   {addr}   { printf__hi $addr }
+proc printf__hhu {addr}   { puts -nonewline [format "%hu"      [peek8  [peek16 $addr]]] }
+proc printf__hu  {addr}   { puts -nonewline [format "%hu"      [peek16 [peek16 $addr]]] }
+proc printf__u   {addr}   { printf__hu $addr }
+proc printf__hhx {addr}   { puts -nonewline [format "%hx"      [peek8  [peek16 $addr]]] }
+proc printf__hx  {addr}   { puts -nonewline [format "%hx"      [peek16 [peek16 $addr]]] }
+proc printf__x   {addr}   { printf__hx $addr }
+proc printf__hhX {addr}   { puts -nonewline [format "%hX"      [peek8  [peek16 $addr]]] }
+proc printf__hX  {addr}   { puts -nonewline [format "%hX"      [peek16 [peek16 $addr]]] }
+proc printf__X   {addr}   { printf__hX $addr }
+proc printf__hho {addr}   { puts -nonewline [format "%ho"      [peek8  [peek16 $addr]]] }
+proc printf__ho  {addr}   { puts -nonewline [format "%ho"      [peek16 [peek16 $addr]]] }
+proc printf__o   {addr}   { printf__ho $addr }
+proc printf__hhb {addr}   { puts -nonewline [format "%hb"      [peek8  [peek16 $addr]]] }
+proc printf__hb  {addr}   { puts -nonewline [format "%hb"      [peek16 [peek16 $addr]]] }
+proc printf__b   {addr}   { printf__hb $addr }
 
 proc printf {addr} {
     global ppos
@@ -55,16 +72,24 @@ proc printf {addr} {
     set arg_addr [expr $addr + 2]
     set pad   ""  ;# padded string
     set trunc ""  ;# truncated string
+    set isize ""  ;# integer size
     set raw   ""
 
     for {set byte [peek $ending_addr]} {$byte > 0} {incr ending_addr; set byte [peek $ending_addr]} {
         set c [format "%c" $byte]
         switch $c {
             "%" { if {$ppos eq 1} { incr ppos -1; append raw $c } else { incr ppos } }
-            "c" { if {$ppos eq 1} { incr ppos -1; set command "[printf__c $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "S" { if {$ppos > 0}  {   set ppos 0; set command "[printf__S $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
-            "s" { if {$ppos > 0}  {   set ppos 0; set command "[printf__s $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
-            "i" { if {$ppos eq 1} { incr ppos -1; set command "[printf__i $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "c" { if {$ppos eq 1} { incr ppos -1; set cmd "[printf__c         $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "S" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__S         $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
+            "s" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__s         $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
+            "i" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}i $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "d" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}i $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "u" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}u $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "x" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}x $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "X" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}X $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "o" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}o $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "b" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}b $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "h" { if {$ppos > 0}  { append isize $c; incr ppos } }
             default {
                 if {$ppos > 0 && $byte eq 45} {
                     append truc $c
@@ -80,10 +105,10 @@ proc printf {addr} {
                 }
             }
         }
-        if {[info exists command]} {
+        if {[info exists cmd]} {
             puts -nonewline $raw; set raw ""
-            eval $command
-            unset command
+            eval $cmd
+            unset cmd
         } else {
             puts -nonewline $raw; set raw ""
         }
@@ -157,11 +182,11 @@ proc print_input {{value 0}} {
 }
 
 if { [info exists ::env(DEBUG)] && $::env(DEBUG) > 0 } {
+    puts stderr "DEBUG MODE"
     set use_pause $::env(DEBUG)
     #ext debugdevice
     debug set_watchpoint write_io {0x2e} {} {process_input $::wp_last_value}
     debug set_watchpoint write_io {0x2f} {} {print_input $::wp_last_value}
 }
 
-bind "mouse button2 down" toggle grabinput
-plug joyporta mouse
+ext debugdevice
