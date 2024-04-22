@@ -45,25 +45,25 @@ proc addr2string {addr} {
 ;# formatting commands
 proc printf__c {addr}     { puts -nonewline [format "%c"       [peek [peek16 $addr]]] }
 proc printf__s {num addr} { puts -nonewline [format "%${num}s" [addr2string [peek16 [peek16 $addr]]]] }
-proc printf__S {num addr} { puts -nonewline [format "%${num}s" [string toupper [addr2string [peek16 [peek16 $addr]]]]] }
-proc printf__hhi {addr}   { puts -nonewline [format "%hi"      [peek8  [peek16 $addr]]] }
-proc printf__hi  {addr}   { puts -nonewline [format "%hi"      [peek16 [peek16 $addr]]] }
-proc printf__i   {addr}   { printf__hi $addr }
-proc printf__hhu {addr}   { puts -nonewline [format "%hu"      [peek8  [peek16 $addr]]] }
-proc printf__hu  {addr}   { puts -nonewline [format "%hu"      [peek16 [peek16 $addr]]] }
-proc printf__u   {addr}   { printf__hu $addr }
-proc printf__hhx {addr}   { puts -nonewline [format "%hx"      [peek8  [peek16 $addr]]] }
-proc printf__hx  {addr}   { puts -nonewline [format "%hx"      [peek16 [peek16 $addr]]] }
-proc printf__x   {addr}   { printf__hx $addr }
-proc printf__hhX {addr}   { puts -nonewline [format "%hX"      [peek8  [peek16 $addr]]] }
-proc printf__hX  {addr}   { puts -nonewline [format "%hX"      [peek16 [peek16 $addr]]] }
-proc printf__X   {addr}   { printf__hX $addr }
-proc printf__hho {addr}   { puts -nonewline [format "%ho"      [peek8  [peek16 $addr]]] }
-proc printf__ho  {addr}   { puts -nonewline [format "%ho"      [peek16 [peek16 $addr]]] }
-proc printf__o   {addr}   { printf__ho $addr }
-proc printf__hhb {addr}   { puts -nonewline [format "%hb"      [peek8  [peek16 $addr]]] }
-proc printf__hb  {addr}   { puts -nonewline [format "%hb"      [peek16 [peek16 $addr]]] }
-proc printf__b   {addr}   { printf__hb $addr }
+proc printf__S {num addr} { puts -nonewline [format "%${num}s" [string toupper  [addr2string [peek16 [peek16 $addr]]]]] }
+proc printf__hhi {lpad num addr} { puts -nonewline [format "%${lpad}${num}hi" [peek8  [peek16 $addr]]] }
+proc printf__hi  {lpad num addr} { puts -nonewline [format "%${lpad}${num}hi" [peek16 [peek16 $addr]]] }
+proc printf__i   {lpad num addr} { [printf__hi $lpad $num $addr] }
+proc printf__hhu {lpad num addr} { puts -nonewline [format "%${lpad}${num}hu" [peek8  [peek16 $addr]]] }
+proc printf__hu  {lpad num addr} { puts -nonewline [format "%${lpad}${num}hu" [peek16 [peek16 $addr]]] }
+proc printf__u   {lpad num addr} { [printf__hu $lpad $num $addr] }
+proc printf__hhx {lpad num addr} { puts -nonewline [format "%${lpad}${num}hx" [peek8  [peek16 $addr]]] }
+proc printf__hx  {lpad num addr} { puts -nonewline [format "%${lpad}${num}hx" [peek16 [peek16 $addr]]] }
+proc printf__x   {lpad num addr} { [printf__hx $lpad $num $addr] }
+proc printf__hhX {lpad num addr} { puts -nonewline [format "%${lpad}${num}hX" [peek8  [peek16 $addr]]] }
+proc printf__hX  {lpad num addr} { puts -nonewline [format "%${lpad}${num}hX" [peek16 [peek16 $addr]]] }
+proc printf__X   {lpad num addr} { [printf__hX $lpad $num $addr] }
+proc printf__hho {lpad num addr} { puts -nonewline [format "%${lpad}${num}ho" [peek8  [peek16 $addr]]] }
+proc printf__ho  {lpad num addr} { puts -nonewline [format "%${lpad}${num}ho" [peek16 [peek16 $addr]]] }
+proc printf__o   {lpad num addr} { [printf__ho $lpad $num $addr] }
+proc printf__hhb {lpad num addr} { puts -nonewline [format "%${lpad}${num}hb" [peek8  [peek16 $addr]]] }
+proc printf__hb  {lpad num addr} { puts -nonewline [format "%${lpad}${num}hb" [peek16 [peek16 $addr]]] }
+proc printf__b   {lpad num addr} { [printf__hb $lpad $num $addr] }
 
 proc printf {addr} {
     global ppos
@@ -73,6 +73,7 @@ proc printf {addr} {
     set pad   ""  ;# padded string
     set trunc ""  ;# truncated string
     set isize ""  ;# integer size
+    set lpad  ""  ;# left-padded with zero or not
     set raw   ""
 
     for {set byte [peek $ending_addr]} {$byte > 0} {incr ending_addr; set byte [peek $ending_addr]} {
@@ -82,13 +83,13 @@ proc printf {addr} {
             "c" { if {$ppos eq 1} { incr ppos -1; set cmd "[printf__c         $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
             "S" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__S         $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
             "s" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__s         $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
-            "i" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}i $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "d" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}i $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "u" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}u $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "x" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}x $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "X" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}X $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "o" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}o $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "b" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}b $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "i" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}i $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "d" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}i $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "u" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}u $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "x" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}x $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "X" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}X $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "o" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}o $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "b" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}b $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
             "h" { if {$ppos > 0}  { append isize $c; incr ppos } }
             default {
                 if {$ppos > 0 && $byte eq 45} {
@@ -96,6 +97,9 @@ proc printf {addr} {
                     append ppos
                 } elseif {$ppos eq 1 && $byte eq 46} {
                     append pad $c
+                    append ppos
+                } elseif {$ppos eq 1 && byte == 48) {
+                    append lpad $c
                     append ppos
                 } elseif {$ppos eq 1 && $byte >= 48 && $byte <= 57} {
                     append pad $c
