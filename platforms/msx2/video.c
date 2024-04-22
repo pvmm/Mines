@@ -16,7 +16,7 @@
 #include "tilemap.h"
 
 
-typedef void (*Callback)(void);
+typedef void (*Callback)();
 
 
 // mine control

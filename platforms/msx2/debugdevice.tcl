@@ -81,24 +81,24 @@ proc printf {addr} {
         switch $c {
             "%" { if {$ppos eq 1} { incr ppos -1; append raw $c } else { incr ppos } }
             "c" { if {$ppos eq 1} { incr ppos -1; set cmd "[printf__c         $arg_addr]"; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "S" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__S         $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
-            "s" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__s         $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
-            "i" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}i $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "d" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}i $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "u" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}u $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "x" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}x $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "X" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}X $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "o" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}o $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
-            "b" { if {$ppos > 0}  {   set ppos 0; set cmd "[printf__${isize}b $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "S" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__S         $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
+            "s" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__s         $pad$trunc $arg_addr]"; set pad ""; set trunc ""; incr arg_addr 2 } else { append raw $c } }
+            "i" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}i $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "d" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}i $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "u" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}u $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "x" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}x $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "X" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}X $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "o" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}o $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
+            "b" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}b $lpad $pad $arg_addr]"; set lpad ""; set pad ""; incr arg_addr 2 } else { append raw $c } }
             "h" { if {$ppos > 0}  { append isize $c; incr ppos } }
             default {
-                if {$ppos > 0 && $byte eq 45} {
+                if {$ppos > 0 && $c eq "-"} {
                     append truc $c
                     append ppos
-                } elseif {$ppos eq 1 && $byte eq 46} {
+                } elseif {$ppos eq 1 && $c eq "."} {
                     append pad $c
                     append ppos
-                } elseif {$ppos eq 1 && byte == 48) {
+                } elseif {$ppos eq 1 && $c eq "0"} {
                     append lpad $c
                     append ppos
                 } elseif {$ppos eq 1 && $byte >= 48 && $byte <= 57} {

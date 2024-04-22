@@ -15,21 +15,22 @@ extern void video_init(void);
 extern void enable_vblank(void);
 
 // debug_printf example
-char* arg1 = "someone";
-int arg2 = 102;
+char* const arg1 = "someone";
+int const arg2 = 1102;
+/*
 struct debug_printf_data const message = {
-    "Hello, %i (%-22.4s)! Percent signal = %%\n",
+    "Hello, %hhi (%-22.4s)! Percent signal = %%\n",
     { &arg2, arg1 }
 };
+*/
 
-void* const datax[] = {
-	&arg2, arg1
-};
-
-void platform_init(void)
+void platform_init()
 {
     set_random_seed(read_clock());
-    debug_printf(&message);
+    //_debug_printf(&message);
+    debug_printf("Hello, %hhi (%-22.4s)! Percent signal = %%\n", &arg2, arg1);
+    debug_printf("Goodbye, %hhi (%22s)!\n", &arg2, arg1);
+
 bla:
     goto bla;
     //video_init();

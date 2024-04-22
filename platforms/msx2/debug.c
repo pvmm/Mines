@@ -5,9 +5,12 @@
 
 #include "msx2.h"
 #include "common.h"
+#include <stdint.h>
 
 
-uint16_t _stored_debug_mode = DEBUG_INT;
+#define NULL ((char *)0)
+
+uint16_t _stored_numeric_mode = DEBUG_INT;
 
 
 // send value to debug device (control)
@@ -24,7 +27,7 @@ void _out2e(uint8_t value) __z88dk_fastcall
 // send value to debug device (data)
 void _out2f(uint8_t value) __z88dk_fastcall
 {
-    value;
+    UNUSED(value);
     __asm
         ld a, l
         out (#0x2f), a
@@ -34,7 +37,7 @@ void _out2f(uint8_t value) __z88dk_fastcall
 
 void debug_mode(uint8_t mode)
 {
-    _stored_debug_mode = mode;
+    _stored_numeric_mode = mode;
 }
 
 
@@ -56,7 +59,7 @@ void debug_msg(char* msg)
 
 void _debug_num(uint16_t value)
 {
-    _out2e(_stored_debug_mode);
+    _out2e(_stored_numeric_mode);
     _out2f(value & 0xff);               // LSB
     _out2f((value >> 8) & 0xff);        // MSB
 }
@@ -78,7 +81,7 @@ void debug_break()
     __endasm;
 }
 
-inline void _debug_printf(struct debug_printf_data* data) 
+inline void __debug_printf(struct debug_printf_data* data) 
 {
     UNUSED(data);
     __asm
@@ -90,10 +93,10 @@ inline void _debug_printf(struct debug_printf_data* data)
     __endasm;
 }
 
-void debug_printf(struct debug_printf_data* data)
+void _debug_printf(struct debug_printf_data* data)
 {
     UNUSED(data);
-    _debug_printf(data);
+    __debug_printf(data);
 }
 
 #else
