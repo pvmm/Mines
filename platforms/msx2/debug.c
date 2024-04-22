@@ -78,6 +78,24 @@ void debug_break()
     __endasm;
 }
 
+inline void _debug_printf(struct debug_printf_data* data) 
+{
+    UNUSED(data);
+    __asm
+        ld a, #DEBUG_PRINTF
+	out (#0x2e), a
+        ld c, #0x2f
+        out (c), l
+        out (c), h
+    __endasm;
+}
+
+void debug_printf(struct debug_printf_data* data)
+{
+    UNUSED(data);
+    _debug_printf(data);
+}
+
 #else
 
 typedef int make_iso_compilers_happy;

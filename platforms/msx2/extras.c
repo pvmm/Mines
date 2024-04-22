@@ -11,15 +11,29 @@ static minefield _minefield;
 static uint8_t _cells[WIDTH * HEIGHT];
 
 
-extern void video_init();
-extern void enable_vblank();
+extern void video_init(void);
+extern void enable_vblank(void);
 
+// debug_printf example
+char* arg1 = "someone";
+int arg2 = 102;
+struct debug_printf_data const message = {
+    "Hello, %i (%-22.4s)! Percent signal = %%\n",
+    { &arg2, arg1 }
+};
 
-void platform_init()
+void* const datax[] = {
+	&arg2, arg1
+};
+
+void platform_init(void)
 {
     set_random_seed(read_clock());
-    video_init();
-    enable_vblank();
+    debug_printf(&message);
+bla:
+    goto bla;
+    //video_init();
+    //enable_vblank();
 }
 
 

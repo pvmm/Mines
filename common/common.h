@@ -133,7 +133,8 @@ int random_number(int min, int max);
 #define DEBUG_INT          1
 #define DEBUG_BIN          2
 #define DEBUG_CHAR         3
-#define DEBUG_INVALID      4
+#define DEBUG_PRINTF       4
+#define DEBUG_INVALID      5
 
 /**
  * [Optional] Change emulator's debug mode. This allows programs to output text
@@ -146,6 +147,7 @@ int random_number(int min, int max);
  * | DEBUG_INT             |   1   |
  * | DEBUG_BIN             |   2   |
  * | DEBUG_CHAR            |   3   |
+ * | DEBUG_PRINTF          |   4   |
  *
  * See [debug()](#debug) for more details about the output.
  *
@@ -204,6 +206,58 @@ void debug_break();
 void wait_tick();
 
 
+#ifndef DISABLE_DEBUG_PRINTF
+/**
+ * A printf structure in memory. This is a new way of printing strings that is more
+ * complete like `printf`, but using Tcl for most of the formatting and printing.
+ *
+ * 📌 **Implementation details**
+ *
+ * Be warned that if there is a mismatch between args and placeholders in the format
+ * string, Tcl may print garbage to stdout if it runs out of arguments.
+ *
+ * | Allowed placeholder types                  |   Value and alternatives   |
+ * | ------------------------------------------ | -------------------------- |
+ * | The "%" character                          |                       "%%" |
+ * | Character                                  |                       "%c" |
+ * | Nul-terminated string                      |                       "%s" |
+ * | Nul-terminated string uppercase            |                       "%S" |
+ * | Left-padded nul-terminated string          |                "%[width]s" |
+ * | Right-padded nul-terminated string         |               "%-[width]s" |
+ * | Truncate string at [width] size            |               "%.[width]s" |
+ * | Packed BCD (2 digits)                      |                       "%n" |
+ * | Truncate packed BCD at [width] size        |               "%.[width]n" |
+ * | 8-bit unsigned integer                     |                     "%hhu" |
+ * | 8-bit signed integer                       |                     "%hhi" |
+ * | 8-bit hexadecimal (a-f)                    |                     "%hhx" |
+ * | 8-bit hexadecimal (A-F)                    |                     "%hhX" |
+ * | 8-bit binary                               |                     "%hhb" |
+ * | 8-bit octal                                |                     "%hho" |
+ * | 16-bit unsigned integer                    |                 "%u" "%hu" |
+ * | 16-bit signed integer                      |      "%i" "%d" "%hi" "%hd" |
+ * | Left-padded integer                        |               "%0[count]u" |
+ * | 16-bit hexadecimal (a-f)                   |                 "%x" "%hx" |
+ * | 16-bit hexadecimal (A-F)                   |                 "%X" "%hX" |
+ * | 16-bit binary                              |                 "%b" "%hb" |
+ * | 16-bit octal                               |                 "%o" "%ho" |
+ * | 32-bit unsigned integer                    |                      "%lu" |
+ * | 32-bit signed integer                      |                "%li" "%ld" |
+ * | 32-bit hexadecimal (a-f)                   |                      "%lx" |
+ * | 32-bit hexadecimal (A-F)                   |                      "%lX" |
+ * | 32-bit binary                              |                      "%lb" |
+ * | 32-bit octal                               |                      "%lo" |
+ * | 16-bit fixed point                         |                      "%fp" |
+ * | Void pointer (platform specific)           |                       "%p" |
+ */
+struct debug_printf_data
+{
+	char* fmt;
+	void* const args[]; // fill this once at compile time
+};
+
+void debug_printf(struct debug_printf_data* data);
+#endif /* DISABLE_DEBUG_PRINTF */
+
 /**
  * Breaks execution if not `ok` and displays optional message after the `ok` parameter.
  *
@@ -248,6 +302,10 @@ void wait_tick();
 #define debug(x, y)
 #define debug_msg(x)
 #define debug_break()
+
+#ifdef DISABLE_DEBUG_PRINTF
+# define debug_printf(printf)
+#endif /* DISABLE_DEBUG_PRINTF */
 
 # ifndef NO_VARIADIC
 #  define assert(x, ...)
