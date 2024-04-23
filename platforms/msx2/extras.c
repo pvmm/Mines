@@ -15,14 +15,14 @@ extern void video_init(void);
 extern void enable_vblank(void);
 
 // debug_printf example
-char* arg1 = "someone";
-int arg2 = 101;
+char* arg1 = "sameone";
+int arg2 = 103;
 float arg3 = 0.234567;
+int arg4 = 0x1111;
 
 void platform_init()
 {
     set_random_seed(read_clock());
-    //_debug_printf(&message);
     debug_printf("Hello, %hi (%-22.4s)! Percent signal = %%\n", &arg2, arg1);
     debug_printf("Goodbye, %08hi (%22f)!\n", &arg2, &arg3);
 

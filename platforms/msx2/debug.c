@@ -81,7 +81,7 @@ void debug_break()
     __endasm;
 }
 
-inline void __debug_printf(struct debug_printf_data* data) 
+inline void _debug_printf(struct debug_printf_data* data)
 {
     UNUSED(data);
     __asm
@@ -91,12 +91,6 @@ inline void __debug_printf(struct debug_printf_data* data)
         out (c), l
         out (c), h
     __endasm;
-}
-
-void _debug_printf(struct debug_printf_data* data)
-{
-    UNUSED(data);
-    __debug_printf(data);
 }
 
 #else

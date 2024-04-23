@@ -64,18 +64,24 @@ proc printf__o   {mod addr} { [printf__ho $mod $addr] }
 proc printf__hhb {mod addr} { puts -nonewline [format "%${mod}hb" [peek8  [peek16 $addr]]] }
 proc printf__hb  {mod addr} { puts -nonewline [format "%${mod}hb" [peek16 [peek16 $addr]]] }
 proc printf__b   {mod addr} { [printf__hb $mod $addr] }
-proc printf__f   {mod addr} { puts -nonewline [format "%${mod}s"  [parse_float [peek16 $addr]]] }
-proc printf__z   {mod addr} { puts "mod=$mod" }
+proc printf__f   {mod addr} { puts -nonewline [format "%${mod}s"  [parse_basic_float [peek16 $addr]]] }
+;#proc printf__hf  {mod addr} { puts -nonewline [format "%${mod}s"  [parse_sdcc_float  [peek16 $addr]]] }
+;#proc printf__hf  {mod addr} { puts -nonewline [format "%${mod}s"  [parse_fp_float    [peek16 $addr]]] }
+proc printf__z   {mod addr} { puts "mod=$mod" } ;# debug
 
-proc parse_float {addr} {
-    set buf ""
-	set exp [peek8 $addr]
-	set mantissa [debug read_block memory $addr 3] ;# string
-	for {set b 0} {$b < [string length mantissa]} {incr b} {
-		set c [scan [string index $mantissa $b] %c]
-		append buf $c
-	}
-	return $buf
+;# parse BASIC float
+proc parse_basic_float {addr} {
+    set buf "0."
+    set tmp [peek8 $addr]
+    set signal [expr $tmp & 0x80 ? {"-"} : {"+"}]
+    set exponent [expr ($tmp & 0x7f) - 0x40]
+    set mantissa [debug read_block memory [expr $addr + 1] 3] ;# read_block returns a string
+    for {set b 0} {$b < 3} {incr b} {
+        set i [scan [string index $mantissa $b] %c]
+        append buf [format %x $i]
+    }
+    append buf "e$signal$exponent"
+    return $buf
 }
 
 ;# empty variable args
@@ -92,36 +98,36 @@ proc printf {addr} {
     set arg_addr [expr $addr + 2]
     set neg   ""  ;# negative sign?
     set lpad  ""  ;# pad size in characters
-    set dot   ""  ;# truncate dot?
+    set tdot  ""  ;# truncated dot?
     set rpad  ""  ;# truncated size in characters
-    set isize ""  ;# integer size prefix such as hh, h, l
+    set cats  ""  ;# category suffix
     set raw   ""
 
     for {set byte [peek $ending_addr]} {$byte > 0} {incr ending_addr; set byte [peek $ending_addr]} {
         set c [format "%c" $byte]
         switch $c {
             "%" { if {$ppos eq 1} { incr ppos -1; append raw $c } else { incr ppos } }
-            "c" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__c         $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "S" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__S         $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "s" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__s         $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "i" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}i $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "d" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}i $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "u" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}u $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "x" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}x $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "X" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}X $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "o" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}o $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "b" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${isize}b $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "f" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__f         $neg$lpad$dot$rpad $arg_addr]"; e= neg lpad dot rpad isize; incr arg_addr 2 } else { append raw $c } }
-            "h" { if {$ppos > 0}  { append isize $c; incr ppos } }
+            "c" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__c         $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "S" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__S         $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "s" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__s         $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "i" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${cats}i $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "d" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${cats}i $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "u" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${cats}u $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "x" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${cats}x $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "X" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${cats}X $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "o" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${cats}o $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "b" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${cats}b $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "f" { if {$ppos > 0}  { set ppos 0; set cmd "[printf__${cats}f $neg$lpad$tdot$rpad $arg_addr]"; e= neg lpad tdot rpad cats; incr arg_addr 2 } else { append raw $c } }
+            "h" { if {$ppos > 0}  { append cats $c; incr ppos } }
             default {
                 if {$ppos eq 1 && $c eq "-"} {
                     append neg $c
                     incr ppos
                 } elseif {$ppos > 0 && $c eq "."} {
-                    append dot $c
+                    append tdot $c
                     incr ppos
                 } elseif {$ppos > 0 && $byte >= 48 && $byte <= 57} {
-                    if {$dot eq ""} { append lpad $c } else { append rpad $c }
+                    if {$tdot eq ""} { append lpad $c } else { append rpad $c }
                     incr ppos
                 } else {
                     set ppos 0; append raw $c
@@ -188,9 +194,7 @@ proc print_input {{value 0}} {
         4 {
             if {$npos == 1} {
                 set addr [expr {($value << 8) + $addr}]
-		message "addr = $addr"
-		printf $addr
-                ;# puts stderr [format "0X%X" $int]
+                printf $addr
                 set addr 0
                 incr npos -1
             } else {
