@@ -225,8 +225,6 @@ void wait_tick();
  * | Left-padded nul-terminated string          |              "%[width]s" |
  * | Right-padded nul-terminated string         |             "%-[width]s" |
  * | Truncate string at [width] size            |             "%.[width]s" |
- * | Packed BCD (2 digits)                      |                     "%n" | missing
- * | Truncate packed BCD at [width] size        |             "%.[width]n" |
  * | 8-bit unsigned integer                     |                   "%hhu" |
  * | 8-bit signed integer                       |                   "%hhi" |
  * | 8-bit hexadecimal (a-f)                    |                   "%hhx" |
